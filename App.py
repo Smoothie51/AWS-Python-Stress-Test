@@ -28,8 +28,6 @@ def home():
         flash(f"Error: {str(e)}", "danger")
         return render_template('index.html', items=[])
 
-# ... (Keep your add/delete/stress routes the same) ...
-# Just ensure your 'add' route redirects back to 'home'
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
