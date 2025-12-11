@@ -9,7 +9,7 @@ app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
 # --- CONFIGURATION ---
-BUCKET_NAME = os.environ.get('BUCKET_NAME', 'cloud-project-assets-[your-id]')
+BUCKET_NAME = os.environ.get('BUCKET_NAME', 'cloudproject22059943')
 TABLE_NAME = os.environ.get('TABLE_NAME', 'InventoryData')
 REGION = os.environ.get('AWS_REGION', 'us-east-1')
 
