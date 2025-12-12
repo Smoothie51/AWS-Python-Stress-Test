@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Item</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container edit-container">
+        <h1>Edit Item</h1>
+        <form action="/admin/update/{{ item.ItemID }}" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Item Name:</label>
+                <input type="text" name="name" value="{{ item.Name }}" required>
+            </div>
+            <div class="form-group">
+                <label>Price:</label>
+                <input type="text" name="price" value="{{ item.Price }}" required>
+            </div>
+            <div class="form-group">
+                <label>Current Image:</label>
+                <img src="https://{{ bucket }}.s3.{{ region }}.amazonaws.com/{{ item.ItemID }}" 
+                     class="current-image" alt="{{ item.Name }}">
+            </div>
+            <div class="form-group">
+                <label>New Image (leave empty to keep current):</label>
+                <input type="file" name="image" accept="image/*">
+            </div>
+            <div class="button-group">
+                <button type="submit" class="save-btn">Save Changes</button>
+                <a href="/admin" style="flex: 1; text-decoration: none;">
+                    <button type="button" class="cancel-btn">Cancel</button>
+                </a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
