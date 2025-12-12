@@ -1,33 +1,95 @@
-import os
+# app.py
+from flask import Flask, request, render_template, redirect, url_for
 import boto3
 import uuid
-import time
-import math
-from flask import Flask, request, render_template, redirect, url_for, flash
 
 app = Flask(__name__)
-app.secret_key = 'supersecretkey'
 
-# --- CONFIGURATION ---
-BUCKET_NAME = os.environ.get('BUCKET_NAME', 'cloudproject22059943')
-TABLE_NAME = os.environ.get('TABLE_NAME', 'InventoryData')
-REGION = os.environ.get('AWS_REGION', 'us-east-1')
+# CONFIG - CHANGE THIS BUCKET NAME!
+BUCKET_NAME = 'cloudproject22059943'
+REGION = 'us-east-1'
 
+# Auto-connects using the LabRole (No keys needed)
 s3 = boto3.client('s3', region_name=REGION)
 dynamodb = boto3.resource('dynamodb', region_name=REGION)
-table = dynamodb.Table(TABLE_NAME)
+table = dynamodb.Table('InventoryData')
 
-@app.route('/')
-def home():
-    try:
-        response = table.scan()
-        items = response.get('Items', [])
-        # CHANGE: Now loading a file instead of a string
-        return render_template('index.html', items=items) 
-    except Exception as e:
-        flash(f"Error: {str(e)}", "danger")
-        return render_template('index.html', items=[])
+@app.route('/admin')
+def admin_panel():
+    # Fetch all items from DynamoDB
+    response = table.scan()
+    items = response.get('Items', [])
+    
+    message = request.args.get('message')
+    
+    return render_template('admin.html', 
+                         items=items, 
+                         bucket=BUCKET_NAME, 
+                         region=REGION,
+                         message=message)
 
+@app.route('/admin/add', methods=['POST'])
+def admin_add_item():
+    item_id = str(uuid.uuid4())
+    
+    # Upload to S3
+    s3.upload_fileobj(request.files['image'], BUCKET_NAME, item_id)
+    
+    # Write to DynamoDB
+    table.put_item(Item={
+        'ItemID': item_id,
+        'Name': request.form['name'],
+        'Price': request.form['price']
+    })
+    
+    return redirect(url_for('admin_panel', message='Item added successfully!'))
+
+@app.route('/admin/edit/<item_id>')
+def admin_edit_item(item_id):
+    # Get item from DynamoDB
+    response = table.get_item(Key={'ItemID': item_id})
+    item = response.get('Item')
+    
+    if not item:
+        return redirect(url_for('admin_panel', message='Item not found!'))
+    
+    return render_template('edit.html', 
+                         item=item, 
+                         bucket=BUCKET_NAME, 
+                         region=REGION)
+
+@app.route('/admin/update/<item_id>', methods=['POST'])
+def admin_update_item(item_id):
+    # Update item in DynamoDB
+    table.update_item(
+        Key={'ItemID': item_id},
+        UpdateExpression='SET #name = :name, Price = :price',
+        ExpressionAttributeNames={'#name': 'Name'},
+        ExpressionAttributeValues={
+            ':name': request.form['name'],
+            ':price': request.form['price']
+        }
+    )
+    
+    # If new image is uploaded, replace in S3
+    if 'image' in request.files and request.files['image'].filename:
+        s3.upload_fileobj(request.files['image'], BUCKET_NAME, item_id)
+    
+    return redirect(url_for('admin_panel', message='Item updated successfully!'))
+
+@app.route('/admin/delete/<item_id>', methods=['POST'])
+def admin_delete_item(item_id):
+    # Delete from S3
+    s3.delete_object(Bucket=BUCKET_NAME, Key=item_id)
+    
+    # Delete from DynamoDB
+    table.delete_item(Key={'ItemID': item_id})
+    
+    return redirect(url_for('admin_panel', message='Item deleted successfully!'))
+
+@app.route('/health')
+def health():
+    return "Healthy", 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
