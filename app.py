@@ -126,8 +126,7 @@ def stress():
     thread = threading.Thread(target=burn_cpu)
     thread.start()
     
-    flash("Stress test started in background! Check CloudWatch.", "info")
-    return redirect(url_for('admin_panel'))
+    return redirect(url_for('admin_panel',message='Server stress test complete!'))
 
 
 if __name__ == '__main__':
