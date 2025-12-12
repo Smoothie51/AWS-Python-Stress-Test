@@ -17,6 +17,12 @@ s3 = boto3.client('s3', region_name=REGION)
 dynamodb = boto3.resource('dynamodb', region_name=REGION)
 table = dynamodb.Table('InventoryData')
 
+@app.route('/')
+def index():
+    # Instantly redirect anyone hitting "/" to "/admin"
+    return redirect(url_for('admin_panel')) 
+
+
 @app.route('/admin')
 def admin_panel():
     # Fetch all items from DynamoDB
@@ -121,7 +127,7 @@ def stress():
     thread.start()
     
     flash("Stress test started in background! Check CloudWatch.", "info")
-    return redirect(url_for('admin'))
+    return redirect(url_for('admin_panel'))
 
 
 if __name__ == '__main__':
