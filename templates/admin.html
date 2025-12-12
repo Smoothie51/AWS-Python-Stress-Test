@@ -33,6 +33,16 @@
         
         <h2>Current Inventory</h2>
         
+        <div style="margin: 20px 0; text-align: center;">
+            <a href="/stress">
+                <button class="stress-btn">⚠️ TRIGGER CPU STRESS TEST</button>
+            </a>
+            <p style="color: #666; font-size: 12px; margin-top: 10px;">
+                This will run a 60-second CPU stress test to trigger AWS Auto Scaling
+            </p>
+        </div>
+
+
         {% if items %}
         <table>
             <thead>

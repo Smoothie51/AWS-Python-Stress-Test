@@ -178,3 +178,18 @@ tr:hover {
     gap: 10px;
     margin-top: 20px;
 }
+.stress-btn {
+    background: #dc3545;
+    color: white;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    border: 2px solid #c82333;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+.stress-btn:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.3);
+}

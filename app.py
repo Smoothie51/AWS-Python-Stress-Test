@@ -103,5 +103,16 @@ def admin_delete_item(item_id):
 def health():
     return "Healthy", 200
 
+@app.route('/stress')
+def stress():
+    import time
+    import math
+    # BURNS CPU FOR 60 SECONDS to trigger Auto Scaling
+    timeout = time.time() + 60
+    while time.time() < timeout:
+        math.sqrt(64*64*64*64) 
+    return "Stress Test Complete! Check CloudWatch."
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
