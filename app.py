@@ -20,6 +20,17 @@ def admin_panel():
     response = table.scan()
     items = response.get('Items', [])
     
+    for item in items:
+        try:
+            secure_url = s3.generate_presigned_url(
+                'get_object',
+                Params={'Bucket': BUCKET_NAME, 'Key': item['ItemID']},
+                ExpiresIn=3600  # Link valid for 1 hour
+            )
+            item['ImageURL'] = secure_url
+        except Exception as e:
+            print(f"Error signing link for {item['ItemID']}: {e}")
+
     message = request.args.get('message')
     
     return render_template('admin.html', 
@@ -27,6 +38,7 @@ def admin_panel():
                          bucket=BUCKET_NAME, 
                          region=REGION,
                          message=message)
+
 
 @app.route('/admin/add', methods=['POST'])
 def admin_add_item():
