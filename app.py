@@ -2,6 +2,9 @@
 from flask import Flask, request, render_template, redirect, url_for
 import boto3
 import uuid
+import time
+import math
+import threading
 
 app = Flask(__name__)
 
@@ -103,15 +106,22 @@ def admin_delete_item(item_id):
 def health():
     return "Healthy", 200
 
+
+def burn_cpu():
+    # This function runs in the background
+    t_end = time.time() + 60 * 2  # Burn for 2 minutes
+    while time.time() < t_end:
+        math.sqrt(64*64*64*64)
+
 @app.route('/stress')
 def stress():
-    import time
-    import math
-    # BURNS CPU FOR 60 SECONDS to trigger Auto Scaling
-    timeout = time.time() + 60
-    while time.time() < timeout:
-        math.sqrt(64*64*64*64) 
-    return "Stress Test Complete! Check CloudWatch."
+    # Start the "burn_cpu" function in a separate thread
+    # The web request returns immediately, but the CPU keeps burning
+    thread = threading.Thread(target=burn_cpu)
+    thread.start()
+    
+    flash("Stress test started in background! Check CloudWatch.", "info")
+    return redirect(url_for('admin'))
 
 
 if __name__ == '__main__':
