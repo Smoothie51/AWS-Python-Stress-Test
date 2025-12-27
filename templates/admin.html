@@ -6,11 +6,13 @@
 </head>
 <body>
     <div class="container">
-        <h1>Inventory Admin Panel</h1>
-        
-        {% if message %}
-        <div class="message">{{ message }}</div>
-        {% endif %}
+        <div class="admin-header">
+            <h1>Inventory Admin Panel</h1>
+            <div class="admin-menu">
+                <span>Welcome, {{ session.username }}!</span>
+                <a href="/logout" class="logout-btn">Logout</a>
+            </div>
+        </div>
         
         <div class="add-form">
             <h2>Add New Item</h2>
@@ -33,7 +35,15 @@
         
         <h2>Current Inventory</h2>
         
-
+        <div style="margin: 20px 0; text-align: center;">
+            <a href="/stress">
+                <button class="stress-btn">TRIGGER CPU STRESS TEST</button>
+            </a>
+            <p style="color: #666; font-size: 12px; margin-top: 10px;">
+                This will run a 60-second CPU stress test to trigger AWS Auto Scaling
+            </p>
+        </div>
+        
         {% if items %}
         <table>
             <thead>
@@ -49,7 +59,7 @@
                 {% for item in items %}
                 <tr>
                     <td>
-                        <img src="{{ item.ImageURL }}" 
+                        <img src="https://{{ bucket }}.s3.{{ region }}.amazonaws.com/{{ item.ItemID }}" 
                              class="image-preview" alt="{{ item.Name }}">
                     </td>
                     <td>{{ item.Name }}</td>
@@ -70,16 +80,6 @@
                 {% endfor %}
             </tbody>
         </table>
-
-        <div style="margin: 20px 0; text-align: center;">
-            <a href="/stress">
-                <button class="stress-btn">⚠️ TRIGGER CPU STRESS TEST</button>
-            </a>
-            <p style="color: #666; font-size: 12px; margin-top: 10px;">
-                This will run a 60-second CPU stress test to trigger AWS Auto Scaling
-            </p>
-        </div>
-        
         {% else %}
         <div class="empty-state">
             <p>No items in inventory. Add your first item above!</p>
