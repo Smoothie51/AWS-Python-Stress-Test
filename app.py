@@ -5,7 +5,7 @@ import boto3
 import uuid
 import time
 import math
-import threading
+import multiprocessing
 import os
 
 app = Flask(__name__)
@@ -335,15 +335,18 @@ def health():
     return "Healthy", 200
 
 def burn_cpu():
-    t_end = time.time() + 60 * 2
+    t_end = time.time() + 60 * 5
     while time.time() < t_end:
         math.sqrt(64*64*64*64)
 
 @app.route('/stress')
 @admin_required
 def stress():
-    thread = threading.Thread(target=burn_cpu)
-    thread.start()
+    duration = 300 
+    
+    for _ in range(4): 
+        p = multiprocessing.Process(target=burn_cpu, args=(duration,))
+        p.start()
     return redirect(url_for('admin_panel'))
 
 if __name__ == '__main__':
