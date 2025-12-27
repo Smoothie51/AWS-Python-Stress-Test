@@ -323,6 +323,9 @@ def admin_delete_item(item_id):
 
 # ============ STRESS ============
 
+@app.route('/health')
+def health():
+    return "Healthy", 200
 
 def burn_cpu():
     t_end = time.time() + 60 * 2
