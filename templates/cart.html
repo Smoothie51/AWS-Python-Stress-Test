@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Shopping Cart - Inventory System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="shop-header">
+        <div class="container">
+            <div class="header-content">
+                <h1>Shopping Cart</h1>
+                <div class="user-menu">
+                    <a href="/shop" class="cart-link">← Back to Shop</a>
+                    <a href="/logout" class="logout-link">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container" style="margin-top: 20px;">
+        {% if cart_items %}
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart_items %}
+                <tr>
+                    <td>
+                        <img src="{{ item.ImageURL }}" class="cart-image" alt="{{ item.ItemName }}">
+                    </td>
+                    <td>{{ item.ItemName }}</td>
+                    <td>${{ item.Price }}</td>
+                    <td>
+                        <form action="/cart/update/{{ item.ItemID }}" method="post" class="quantity-form">
+                            <input type="number" name="quantity" value="{{ item.Quantity }}" min="1" max="99">
+                            <button type="submit" class="update-btn">Update</button>
+                        </form>
+                    </td>
+                    <td>${{ item.ItemTotal }}</td>
+                    <td>
+                        <form action="/cart/remove/{{ item.ItemID }}" method="post" style="display:inline;">
+                            <button type="submit" class="remove-btn" onclick="return confirm('Remove this item?');">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4" style="text-align: right;"><strong>Total:</strong></td>
+                    <td><strong>${{ total }}</strong></td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+        
+        <div style="margin-top: 30px; text-align: center;">
+            <a href="/shop">
+                <button class="continue-shopping-btn">Continue Shopping</button>
+            </a>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <p>Your cart is empty.</p>
+            <a href="/shop">
+                <button class="continue-shopping-btn">Start Shopping</button>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

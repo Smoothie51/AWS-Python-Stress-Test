@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Shop - Inventory System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="shop-header">
+        <div class="container">
+            <div class="header-content">
+                <h1>Shop</h1>
+                <div class="user-menu">
+                    <span>Welcome, {{ session.username }}!</span>
+                    <a href="/cart" class="cart-link">🛒 Cart</a>
+                    <a href="/logout" class="logout-link">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container" style="margin-top: 20px;">
+        {% if items %}
+        <div class="products-grid">
+            {% for item in items %}
+            <div class="product-card">
+                <img src="{{ item.ImageURL }}" alt="{{ item.Name }}" class="product-image">
+                <div class="product-info">
+                    <h3>{{ item.Name }}</h3>
+                    <p class="product-price">${{ item.Price }}</p>
+                    <form action="/cart/add/{{ item.ItemID }}" method="post">
+                        <div class="quantity-group">
+                            <label>Quantity:</label>
+                            <input type="number" name="quantity" value="1" min="1" max="99">
+                        </div>
+                        <button type="submit" class="add-to-cart-btn">Add to Cart</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <p>No products available at the moment.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
