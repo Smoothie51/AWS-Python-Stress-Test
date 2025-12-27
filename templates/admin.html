@@ -59,7 +59,7 @@
                 {% for item in items %}
                 <tr>
                     <td>
-                        <img src="https://{{ bucket }}.s3.{{ region }}.amazonaws.com/{{ item.ItemID }}" 
+                        <img src="{{item.ImageURL}}" 
                              class="image-preview" alt="{{ item.Name }}">
                     </td>
                     <td>{{ item.Name }}</td>
