@@ -111,7 +111,7 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
-# ============ USER ============
+# ============ SHOP (USER) ============
 
 @app.route('/shop')
 @login_required
@@ -184,12 +184,16 @@ def add_to_cart(item_id):
 def view_cart():
     user_id = session['user_id']
     
-    response = carts_table.scan(
-        FilterExpression='UserID = :uid',
-        ExpressionAttributeValues={':uid': user_id}
-    )
+    try:
+        from boto3.dynamodb.conditions import Attr
+        response = carts_table.scan(
+            FilterExpression=Attr('UserID').eq(user_id)
+        )
+        cart_items = response.get('Items', [])
+    except Exception as e:
+        print(f"Cart scan error: {e}")
+        cart_items = []
     
-    cart_items = response.get('Items', [])
     total = 0
     
     for item in cart_items:
@@ -202,9 +206,12 @@ def view_cart():
         except:
             item['ImageURL'] = ''
         
-        item_total = float(item['Price']) * int(item['Quantity'])
-        item['ItemTotal'] = f"{item_total:.2f}"
-        total += item_total
+        try:
+            item_total = float(item['Price']) * int(item['Quantity'])
+            item['ItemTotal'] = f"{item_total:.2f}"
+            total += item_total
+        except:
+            item['ItemTotal'] = "0.00"
     
     return render_template('cart.html', cart_items=cart_items, total=f"{total:.2f}")
 
@@ -321,7 +328,7 @@ def admin_delete_item(item_id):
     inventory_table.delete_item(Key={'ItemID': item_id})
     return redirect(url_for('admin_panel'))
 
-# ============ STRESS ============
+# ============ HEALTH & STRESS ============
 
 @app.route('/health')
 def health():
