@@ -334,17 +334,6 @@ def admin_delete_item(item_id):
 def health():
     return "Healthy", 200
 
-def burn_cpu():
-    t_end = time.time() + 60 * 5
-    while time.time() < t_end:
-        math.sqrt(64*64*64*64)
-
-@app.route('/stress')
-@admin_required
-def stress():
-    thread = threading.Thread(target=burn_cpu)
-    thread.start()
-    return redirect(url_for('admin_panel'))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
